@@ -5,3 +5,6 @@ venv/
 
 # macOS files
 .DS_Store
+
+# Environment files
+.env
