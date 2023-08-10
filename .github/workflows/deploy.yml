@@ -16,7 +16,7 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.14
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "cis2023-tcw"
+          heroku_app_name: "cis2023-thechinesewall-ivan"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
         env: 
-          HD_OPENAI_API_KEY=${{ secrets.OPENAI_APIKEY }}
+          OPENAI_API_KEY:${{ secrets.OPENAI_APIKEY }}
