@@ -51,10 +51,9 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log('Success:', data);
+            console.log('Success:', data.result);
             document.querySelector('textarea[name="response"]').value =
-              data.result.content;
-            document.querySelector('textarea[name="prompt"]').value = '';
+              data.result;
           })
           .catch((error) => {
             console.error('Error:', error);

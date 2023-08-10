@@ -2,6 +2,7 @@
 __pycache__/
 .venv/
 venv/
+.virtual
 
 # macOS files
 .DS_Store
