@@ -18,4 +18,4 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "cis2023-thechinesewall"
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-          env: OPENAI_APIKEY=${{ secrets.OPENAI_APIKEY }}
+          env: OPENAI_API_KEY=${{ secrets.OPENAI_APIKEY }}
