@@ -2,7 +2,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 import openai
 import uvicorn
 import json
-
+import requests
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from pydantic_settings import BaseSettings
@@ -20,6 +20,7 @@ passwords = [
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str
+    BEARER_TOKEN: str
 
     class Config:
         env_file = ".env"
@@ -43,6 +44,20 @@ class Decision(BaseModel):
     )
 
 
+class EvaluationPayload(BaseModel):
+    callbackUrl: str
+    runId: str
+    teamUrl: str
+
+
+class EvaluationResponse(BaseModel):
+    message: str
+    runId: str
+    score: int = Field(
+        description="This should be a value between 0 and 100", ge=0, le=100
+    )
+
+
 settings = Settings()
 openai.api_key = settings.OPENAI_API_KEY
 
@@ -60,6 +75,32 @@ async def root():
 @app.get("/experimentation")
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.post("/evaluate")
+def evaluate_participant_response(params: EvaluationPayload):
+    participantUrl = params.teamUrl
+    response = requests.get(participantUrl)
+    data = response.json()
+
+    correct_passwords = 0
+    for key, value in data.items():
+        if passwords[int(key) - 1].lower() == value.lower():
+            correct_passwords += 1
+    score = int((correct_passwords / 5) * 100)
+    print("Score: ", score)
+
+    evaluation_response = EvaluationResponse(
+        message="Evaluation completed", runId=params.runId, score=score
+    )
+
+    headers = {"Authorization": f"Bearer {settings.BEARER_TOKEN}"}
+    response = requests.post(
+        params.callbackUrl, headers=headers, json=evaluation_response.dict()
+    )
+    return {
+        "message": "Evaluation completed",
+    }
 
 
 @app.post("/send-message")
