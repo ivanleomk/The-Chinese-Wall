@@ -1,3 +1,4 @@
+from fastapi.responses import FileResponse, HTMLResponse
 import openai
 import uvicorn
 import json
@@ -6,7 +7,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from pydantic_settings import BaseSettings
 from pydantic import BaseModel, Field
-
+from fastapi.staticfiles import StaticFiles
 
 passwords = [
     "Fluffy",
@@ -48,8 +49,15 @@ openai.api_key = settings.OPENAI_API_KEY
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/")
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return FileResponse("static/index.html")
+
+
+@app.get("/experimentation")
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
