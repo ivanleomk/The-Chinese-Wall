@@ -1,92 +1,117 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>The Chinese Wall</title>
-</head>
-<body>
-	<h1>The Chinese Wall</h1>
-	<div>
-		<select name="level">
-			<option value="1">Level 1</option>
-			<option value="2">Level 2</option>
-			<option value="3">Level 3</option>
-			<option value="4">Level 4</option>
-			<option value="5">Level 5</option>
-		</select>
-	</div>
-	<div>
-		<textarea
-			name="prompt"
-			rows="5"
-			cols="40"
-			placeholder="Ask a question..."></textarea>
-		<input type="button" name="send-prompt" value="Send" />
-	</div>
-	<div>
-		<textarea
-			name="response"
-			rows="5"
-			cols="40"
-			readonly
-			placeholder="The answer will appear here..."></textarea>
-	</div>
-	<div>
-		<input
-			type="text"
-			name="answer"
-			placeholder="Enter the secret password..." />
-		<input type="button" name="send-answer" value="Send" />
-	</div>
-	<script>
-		const sendPrompt = () => {
-			const prompt = document.querySelector('textarea[name="prompt"]').value;
-			const level = document.querySelector('select[name="level"]').value;
-			const data = { prompt, level };
-			fetch('/send-message', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(data),
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					document.querySelector('textarea[name="response"]').value = data.result;
-				})
-				.catch((error) => {
-					console.error('Error:', error);
-				});
-		};
-		document
-			.querySelector('input[name="send-prompt"]')
-			.addEventListener('click', sendPrompt);
+  <head>
+    <title>The Chinese Wall</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <main class="container">
+      <h1>The Chinese Wall</h1>
+      <article>
+        <form>
+          <select name="level">
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+            <option value="4">Level 4</option>
+            <option value="5">Level 5</option>
+          </select>
+          <input
+            name="prompt"
+            cols="40"
+            placeholder="Ask a question..."
+          ></input>
+          <button type="button" name="send-prompt">Ask</button>
+          <textarea
+            name="response"
+            rows="5"
+            cols="40"
+            readonly
+            placeholder="The answer will appear here..."
+          ></textarea>
+          <div class="grid">
+            <input
+              type="text"
+              name="answer"
+              placeholder="Enter the secret password..."
+            />
+            <input type="button" name="send-answer" value="Send" />
+          </div>
+        </form>
+      </article>
+    </main>
 
-		const sendAnswer = () => {
-			const password = document.querySelector('input[name="answer"]').value;
-			const level = document.querySelector('select[name="level"]').value;
-			const data = { password, level };
-			fetch('/guess-password', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(data),
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					if (data.success) {
-						alert('Correct!');
-					} else {
-						alert('You could not find the password, try again.');
-					}
-				})
-				.catch((error) => {
-					console.error('Error:', error);
-				});
-		};
-		document
-			.querySelector('input[name="send-answer"]')
-			.addEventListener('click', sendAnswer);
-	</script>
-</body>
+    <script>
+      const btnAsk = document.querySelector('[name="send-prompt"]');
+      const btnAnswer = document.querySelector('[name="send-answer"]');
+      const inputLevel = document.querySelector('[name="level"]');
+      const inputPrompt = document.querySelector('[name="prompt"]');
+      const inputAnswer = document.querySelector('[name="answer"]');
+      const textareaResponse = document.querySelector(
+        '[name="response"]'
+      );
+
+      const sendPrompt = () => {
+        const prompt = inputPrompt.value;
+        const level = inputLevel.value;
+        const data = { prompt, level };
+
+        btnAsk.setAttribute('aria-busy', 'true');
+
+        fetch('/send-message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            textareaResponse.value = data.result;
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          })
+          .finally(() => {
+            btnAsk.removeAttribute('aria-busy');
+          });
+      };
+
+      const sendAnswer = () => {
+        const password = inputAnswer.value;
+        const level = inputLevel.value;
+        const data = { password, level };
+
+        btnAnswer.setAttribute('aria-busy', 'true');
+
+        fetch('/guess-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert('Correct!');
+            } else {
+              alert('You could not find the password, try again.');
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          })
+          .finally(() => {
+            btnAnswer.removeAttribute('aria-busy');
+          });
+      };
+
+      btnAsk.addEventListener('click', sendPrompt);
+      btnAnswer.addEventListener('click', sendAnswer);
+    </script>
+  </body>
 </html>

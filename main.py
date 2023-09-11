@@ -3,11 +3,13 @@ import openai
 import uvicorn
 import json
 import requests
+import psycopg2
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from pydantic_settings import BaseSettings
 from pydantic import BaseModel, Field
 from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 
 passwords = [
     "Fluffy",
@@ -20,6 +22,7 @@ passwords = [
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str
+    DATABASE_URL: str
     BEARER_TOKEN: str
 
     class Config:
@@ -64,6 +67,13 @@ openai.api_key = settings.OPENAI_API_KEY
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+conn = psycopg2.connect(settings.DATABASE_URL)
+conn.autocommit = True
+
+@app.on_event("shutdown")
+async def shutdown():
+    conn.close()
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -75,6 +85,11 @@ async def root():
 @app.get("/experimentation")
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/messages")
+def index(request: Request):
+    return templates.TemplateResponse("messages.html", {"request": request})
 
 
 @app.post("/evaluate")
@@ -113,18 +128,33 @@ def send_message(params: SendMessageParams):
     if not level:
         return {"result": "Level is empty"}
 
+    response = ""
+
     if level == "1":
-        return challenge_1(prompt)
+        response = challenge_1(prompt)
     elif level == "2":
-        return challenge_2(prompt)
+        response = challenge_2(prompt)
     elif level == "3":
-        return challenge_3(prompt)
+        response = challenge_3(prompt)
     elif level == "4":
-        return challenge_4(prompt)
+        response = challenge_4(prompt)
     elif level == "5":
-        return challenge_5(prompt)
+        response = challenge_5(prompt)
     else:
-        return {"result": "Invalid level"}
+        response = {"result": "Invalid level"}
+
+    response_result = response["result"]
+    current_timestamp = datetime.now()
+
+    try:
+        cur = conn.cursor()
+        cur.execute("INSERT INTO messages (level, prompt, response, timestamp) VALUES (%s, %s, %s, %s)",
+                    (level, prompt, response_result, current_timestamp))
+        cur.close()
+    except Exception as err:
+        print("Oops! An exception has occured:", err)
+
+    return response
 
 
 @app.post("/guess-password")
@@ -132,6 +162,18 @@ def guess_password(params: GuessPasswordParams):
     level = params.level
     password = params.password
     return {"success": password.lower() == passwords[int(level) - 1].lower()}
+
+
+@app.get("/logs")
+def get_logs():
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM messages")
+        rows = cur.fetchall()
+        cur.close()
+        return {"logs": rows}
+    except Exception as err:
+        print("Oops! An exception has occured:", err)
 
 
 def challenge_1(prompt: str):

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Chinese Wall</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <script type="module">
+      import { h, Component, render } from 'https://esm.sh/preact';
+      import {
+        useEffect,
+        useMemo,
+        useState
+      } from 'https://esm.sh/preact/hooks';
+      import htm from 'https://esm.sh/htm';
+
+      const html = htm.bind(h);
+
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      });
+
+      function App(props) {
+        const [logs, setLogs] = useState([]);
+
+        useEffect(() => {
+          fetch('/logs')
+            .then((response) => response.json())
+            .then((data) => setLogs(data.logs))
+            .catch((error) => console.error('Error fetching data:', error));
+        }, []);
+
+        return html`<table role="grid">
+          <thead>
+            <tr>
+              <th>Level</th>
+              <th>Timestamp</th>
+              <th>Prompt</th>
+              <th>Response</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logs.map((log, index) => {
+              const date = new Date(log[1]);
+              const formattedDateString = formatter.format(date);
+
+              return html`
+                <tr key=${index}>
+                  <td>${log[4]}</td>
+                  <td>${formattedDateString}</td>
+                  <td>${log[2]}</td>
+                  <td>${log[3]}</td>
+                </tr>
+              `;
+            })}
+          </tbody>
+        </table>`;
+      }
+
+      render(html`<${App} />`, document.body);
+    </script>
+  </body>
+</html>
