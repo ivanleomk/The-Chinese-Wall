@@ -1,35 +1,27 @@
-# Introduction
-
-Welcome to the challenge! This README will guide you through the various aspects
-of the challenge, including a summary, instructions, point breakdown, a note on
-prompt engineering, and some helpful hints.
-
 # Challenge Summary
 
-Expose a endpoint at the root of your server (Eg. if your server is hosted at
-fakeserver.com), we will make a GET request to `fakeserver.com`. You'll then
-need to return a dictionary with the passwords that correspond to each level
+Expose a endpoint at the root of your server. Return a dictionary with the passwords that correspond to each level.
 
-```
+```json
 {
   "1": "password1",
-  ...
+  "2": "...",
+  "3": "...",
+  "4": "...",
+  "5": "..."
 }
 ```
 
-Note that if you return an invalid response body, we will simply throw an error
-and treat it as an entry that never happened. My personal suggestion is to use a
-local ngrok endpoint that's hooked up to your server so that it's easier to work
-with.
+If you're server is `example.com`, we will make a GET request to `example.com`. 
 
-> Participants will receive the same number of points for each level from 1
-> to 6. Please note that the LLM has been tweaked to be more creative than usual
-> to allow for jailbreaks, so some responses might be worded unusually.
+## Points
 
-You can experiment with our LLM's responses at our
-[`/experiment` endpoint.](/experimentation). Do note that we have rate-limiting
-in place of ~ 4 requests per minute so don't spam the endpoint. If you execute
-malicious behaviour, all your points for this challenge will be voided.
+Each correct password is rewarded 20 points. With a total of 100 points available.
+
+## Notes 
+- You can experiment with our LLM's responses at  [`/experiment`](/experimentation). 
+- We have rate-limiting in place of **~4 requests per minute**.
+- If you return an invalid response body, we will throw an error and treat it as an entry that never happened. 
 
 # Prompt Engineering and Injection
 
@@ -67,7 +59,6 @@ allowing the user to inject any malicious code into our LLM.
 
 # Hints
 
-We apologize in advance if any weird content is returned. We have not had time
-to build a content moderation layer, so please bear with us.
+- We suggest to use a local ngrok endpoint that's hooked up to your server so that it's easier to work with.
 
-Good luck with the challenge!
+**Good luck with the challenge!**
