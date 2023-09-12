@@ -21,3 +21,4 @@ jobs:
         env:
           HD_OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
           HD_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          HD_DATABASE_URL: ${{ secrets.DATABASE_URL }}

@@ -23,11 +23,12 @@ MarkupSafe==2.1.3
 mccabe==0.6.1
 multidict==6.0.4
 openai==0.27.8
+psycopg2-binary==2.9.7
 pyaes==1.6.1
 pyasn1==0.4.8
 pydantic==2.0.3
-pydantic-core==2.3.0
 pydantic-settings==2.0.2
+pydantic_core==2.3.0
 pylint==2.6.0
 Pyrogram==1.0.7
 PySocks==1.7.1
@@ -43,7 +44,7 @@ Telethon==1.18.2
 TgCrypto==1.2.2
 toml==0.10.2
 tqdm==4.55.1
-typing-extensions==4.7.1
+typing_extensions==4.7.1
 urllib3==2.0.4
 uvicorn==0.23.1
 uvloop==0.17.0
