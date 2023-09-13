@@ -12,16 +12,17 @@ Expose a endpoint at the root of your server. Return a dictionary with the passw
 }
 ```
 
-If you're server is `example.com`, we will make a GET request to `example.com`. 
+If you're server is `example.com`, we will make a GET request to `example.com`.
 
 ## Points
 
 Each correct password is rewarded 20 points. With a total of 100 points available.
 
-## Notes 
-- You can experiment with our LLM's responses at  [`/experiment`](/experimentation). 
-- We have rate-limiting in place of **~4 requests per minute**.
-- If you return an invalid response body, we will throw an error and treat it as an entry that never happened. 
+## Notes
+
+- You can experiment with our LLM's responses at [`/experiment`](/experimentation).
+- We have rate-limiting in place of **2 requests per 5 seconds**.
+- If you return an invalid response body, we will throw an error and treat it as an entry that never happened.
 
 # Prompt Engineering and Injection
 

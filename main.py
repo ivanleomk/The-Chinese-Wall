@@ -3,9 +3,13 @@ import openai
 import uvicorn
 import json
 import requests
-from fastapi import FastAPI, Request
+import redis.asyncio as redis
+import uvicorn
+from fastapi import Depends, FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
 from lib.utils import get_password
 from models.api import (
@@ -25,6 +29,10 @@ openai.api_key = settings.OPENAI_API_KEY
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+@app.on_event("startup")
+async def startup():
+    r = redis.from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
+    await FastAPILimiter.init(r)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -70,7 +78,7 @@ def evaluate_participant_response(params: EvaluationPayload):
     }
 
 
-@app.post("/send-message")
+@app.post("/send-message", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 def send_message(params: SendMessageParams):
     import time
 
@@ -103,7 +111,7 @@ def send_message(params: SendMessageParams):
     return response
 
 
-@app.post("/guess-password")
+@app.post("/guess-password", dependencies=[Depends(RateLimiter(times=2, seconds=5))])
 def guess_password(params: GuessPasswordParams):
     level = params.level
     password = params.password

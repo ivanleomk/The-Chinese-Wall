@@ -22,10 +22,11 @@
       const formatter = new Intl.DateTimeFormat('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
       });
 
       function App(props) {
@@ -41,20 +42,20 @@
         return html`<table role="grid">
           <thead>
             <tr>
-              <th>Level</th>
-              <th>Timestamp</th>
-              <th>Prompt</th>
-              <th>Response</th>
+              <th scope="col">#</th>
+              <th scope="col">Timestamp</th>
+              <th scope="col">Prompt</th>
+              <th scope="col">Response</th>
             </tr>
           </thead>
           <tbody>
             ${logs.map((log, index) => {
-              const date = new Date(log[1]);
-              const formattedDateString = formatter.format(date);
+              const utcDate = new Date(`${log[1]}Z`);
+              const formattedDateString = formatter.format(utcDate);
 
               return html`
                 <tr key=${index}>
-                  <td>${log[4]}</td>
+                  <th scope="row">${log[4]}</td>
                   <td>${formattedDateString}</td>
                   <td>${log[2]}</td>
                   <td>${log[3]}</td>

@@ -1,7 +1,7 @@
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
-  timestamp TIMESTAMP,
-  level TEXT,
-  prompt TEXT,
-  response TEXT
+  timestamp TIMESTAMP NOT NULL DEFAULT NOW()
+  level VARCHAR(255) NOT NULL,
+  prompt VARCHAR(255) NOT NULL,
+  response VARCHAR(255) NOT NULL,
 );

@@ -26,14 +26,6 @@ https://cis2023-thechinesewall-6f0e2f1f2dfa.herokuapp.com/
 - http://127.0.0.1:8000/docs
 - http://127.0.0.1:8000/redoc
 
-## Create the db table for logs
+## Database Schema
 
-```
-CREATE TABLE messages (
-    id SERIAL PRIMARY KEY,
-    level VARCHAR(255) NOT NULL,
-    prompt VARCHAR(255) NOT NULL,
-    response VARCHAR(255) NOT NULL,
-    timestamp TIMESTAMP NOT NULL DEFAULT NOW()
-);
-```
+Found in [schema.sql](./schema.sql).
