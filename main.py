@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from lib.db import get_all_logs, insert_prompt_into_db
+from lib.utils import get_password
 from models.api import (
     Decision,
     EvaluationPayload,
@@ -16,14 +17,6 @@ from models.api import (
 )
 
 from settings import Settings
-
-passwords = [
-    "Fluffy",
-    "Galactic",
-    "Mangoes",
-    "Subatomic",
-    "Whimsical",
-]
 
 
 settings = Settings()
@@ -56,10 +49,10 @@ def evaluate_participant_response(params: EvaluationPayload):
     participantUrl = params.teamUrl
     response = requests.get(participantUrl)
     data = response.json()
-
     correct_passwords = 0
     for key, value in data.items():
-        if passwords[int(key) - 1].lower() == value.lower():
+        password = get_password(int(key) - 1)
+        if password and password.lower() == value.lower():
             correct_passwords += 1
     score = int((correct_passwords / 5) * 100)
     print("Score: ", score)
