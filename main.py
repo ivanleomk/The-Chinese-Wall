@@ -107,7 +107,8 @@ def send_message(params: SendMessageParams):
 def guess_password(params: GuessPasswordParams):
     level = params.level
     password = params.password
-    return {"success": password.lower() == passwords[int(level) - 1].lower()}
+
+    return {"success": password.lower() == get_password(level).lower()}
 
 
 @app.get("/logs")
