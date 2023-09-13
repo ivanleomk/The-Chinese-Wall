@@ -7,7 +7,7 @@ class SendMessageParams(BaseModel):
 
 
 class GuessPasswordParams(BaseModel):
-    level: str
+    level: int
     password: str
 
 
