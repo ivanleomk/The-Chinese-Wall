@@ -21,7 +21,7 @@ Each correct password is rewarded 20 points. With a total of 100 points availabl
 ## Notes
 
 - You can experiment with our LLM's responses at [`/experiment`](/experimentation).
-- We have rate-limiting in place of **2 requests per 5 seconds**.
+- We have rate-limiting in place of **2 requests per 10 seconds**.
 - If you return an invalid response body, we will throw an error and treat it as an entry that never happened.
 
 # Prompt Engineering and Injection

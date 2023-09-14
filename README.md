@@ -1,6 +1,15 @@
-# the-chinese-wall
+# Introduction
 
-## Getting Started
+Welcome to our repository for the Chinese Wall Challenge for the UBS Coding
+Challenge. During this challenge, users need to trick a LLM into revealing a
+password that it's not supposed to.
+
+This project is built using python, FastAPI and Postgresql. We utilise a few
+other services such as Upstash and Neon to help us with the challenge.
+
+## Installation Instructions
+
+You'll need to install all the local packages as required.
 
 ```bash
 # Create a new virtual environment
@@ -17,15 +26,10 @@ cp .env.example .env
 python3 main.py
 ```
 
-## Development
+We have configured logging of user attempts into a persistent Postgresql
+database with some basic rate limiting. To enable those, you'll need to setup a
+Postgresql database and set the environment variables accordingly. You can find
+our database schema in [schema.sql](./schema.sql)
 
+We have a deployed version currently at
 https://cis2023-thechinesewall-6f0e2f1f2dfa.herokuapp.com/
-
-## Documentation
-
-- http://127.0.0.1:8000/docs
-- http://127.0.0.1:8000/redoc
-
-## Database Schema
-
-Found in [schema.sql](./schema.sql).
