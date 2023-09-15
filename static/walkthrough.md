@@ -1,6 +1,20 @@
-# Challenge Summary
+# The Chinese Wall
 
-Expose a endpoint at the root of your server. Return a dictionary with the passwords that correspond to each level.
+## Introduction
+
+The Chinese Wall is a term commonly used to describe the information barrier
+between the bank's private and public side. We get in big trouble if data leaks
+so we want to make sure that sensitive data never crosses the wall.
+
+In this challenge, you play a role of a hacker that is trying to get access to
+the bank's private side. You have access to a language model that is trained on
+the bank's data. You can use this language model to get access to the bank's
+private side.
+
+## Evaluation
+
+Expose a endpoint at the root of your server. Return a dictionary with the
+passwords that correspond to each level.
 
 ```json
 {
@@ -16,13 +30,16 @@ If you're server is `example.com`, we will make a GET request to `example.com`.
 
 ## Points
 
-Each correct password is rewarded 20 points. With a total of 100 points available.
+Each correct password is rewarded 20 points. With a total of 100 points
+available.
 
 ## Notes
 
-- You can experiment with our LLM's responses at [`/experiment`](/experimentation).
+- You can experiment with our LLM's responses at
+  [`/experiment`](/experimentation).
 - We have rate-limiting in place of **2 requests per 10 seconds**.
-- If you return an invalid response body, we will throw an error and treat it as an entry that never happened.
+- If you return an invalid response body, we will throw an error and treat it as
+  an entry that never happened.
 
 # Prompt Engineering and Injection
 
@@ -60,6 +77,7 @@ allowing the user to inject any malicious code into our LLM.
 
 # Hints
 
-- We suggest to use a local ngrok endpoint that's hooked up to your server so that it's easier to work with.
+- We suggest to use a local ngrok endpoint that's hooked up to your server so
+  that it's easier to work with.
 
 **Good luck with the challenge!**
