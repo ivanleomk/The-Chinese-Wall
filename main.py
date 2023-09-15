@@ -3,10 +3,12 @@ import openai
 import uvicorn
 import json
 import requests
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
+from lib.lifespan import lifespan
 from lib.utils import get_password
 from models.api import (
     Decision,
@@ -15,14 +17,9 @@ from models.api import (
     GuessPasswordParams,
     SendMessageParams,
 )
+from settings import get_settings
 
-from settings import Settings
-
-
-settings = Settings()
-openai.api_key = settings.OPENAI_API_KEY
-
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
 
 
@@ -61,7 +58,7 @@ def evaluate_participant_response(params: EvaluationPayload):
         message="Evaluation completed", runId=params.runId, score=score
     )
 
-    headers = {"Authorization": f"Bearer {settings.BEARER_TOKEN}"}
+    headers = {"Authorization": f"Bearer {get_settings().BEARER_TOKEN}"}
     response = requests.post(
         params.callbackUrl, headers=headers, json=evaluation_response.dict()
     )
@@ -70,11 +67,8 @@ def evaluate_participant_response(params: EvaluationPayload):
     }
 
 
-@app.post("/send-message")
+@app.post("/send-message", dependencies=[Depends(RateLimiter(times=2, seconds=10))])
 def send_message(params: SendMessageParams):
-    import time
-
-    time.time()
     level = params.level
     prompt = params.prompt
 

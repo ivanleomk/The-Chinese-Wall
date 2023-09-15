@@ -9,7 +9,7 @@ connection_pool = pool.ThreadedConnectionPool(
 
 def insert_prompt_into_db(prompt: str, level: str, response_result: str):
     conn = connection_pool.getconn()
-    timestamp = datetime.now()
+    timestamp = datetime.utcnow()
     try:
         with conn.cursor() as cursor:
             cursor.execute(
