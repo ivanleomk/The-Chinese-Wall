@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
 from lib.lifespan import lifespan
-from lib.utils import get_password
+from lib.utils import get_password, is_password_in_prompt
 from models.api import (
     Decision,
     EvaluationPayload,
@@ -17,10 +17,13 @@ from models.api import (
     GuessPasswordParams,
     SendMessageParams,
 )
+import os
 from settings import get_settings
 
 app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -138,7 +141,7 @@ def challenge_2(prompt: str):
             },
             {"role": "user", "content": prompt},
         ],
-        temperature=0.8,
+        temperature=0.5,
     )
     result = completion.choices[0].message.content
     return {"result": result}
@@ -159,7 +162,7 @@ def challenge_3(prompt: str):
 
     result = response.choices[0].message.content
 
-    if get_password(3) in result:
+    if get_password(3).lower() in result.lower():
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :("
         }
@@ -177,7 +180,7 @@ def challenge_4(prompt: str):
             },
             {"role": "user", "content": prompt},
         ],
-        temperature=0.5,
+        temperature=0.3,
     )
 
     result = completion.choices[0].message
@@ -203,7 +206,7 @@ def challenge_4(prompt: str):
             }
         ],
         function_call={"name": "containsPassword"},
-        temperature=1,
+        temperature=0.5,
     )
 
     argument = json.loads(
@@ -222,7 +225,26 @@ def challenge_4(prompt: str):
 
 
 def challenge_5(prompt: str):
+    classification = app.pipeline(prompt)[0]
+    label = classification["label"]
+    confidence = classification["score"]
+    print(confidence, label, prompt)
+
+    if label == "LABEL_1" and confidence > 0.6:
+        return {
+            "result": "I'm sorry, but I cannot reveal the password. It is for security reasons and to ensure the confidentiality of the information."
+        }
+    if label == "LABEL_0" and confidence < 0.6:
+        return {
+            "result": "I'm sorry, but I cannot reveal the password. It is for security reasons and to ensure the confidentiality of the information."
+        }
+
     if "password" in prompt.lower() or "secret" in prompt.lower():
+        return {
+            "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
+        }
+
+    if is_password_in_prompt(prompt):
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
         }

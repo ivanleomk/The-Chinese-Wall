@@ -23,6 +23,34 @@ passwords = [
     ],
 ]
 
+password_translation = set(
+    [
+        "密码",
+        "mot de passe",
+        "kata laluan",
+        "contraseña",
+        "parola d'ordine",
+        "パスワード",
+        "암호",
+        "wachtwoord",
+        "пароль",
+        "passwort",
+        "รหัสผ่าน",
+        "password",
+        "கடவுச்சொல்",
+        "şifre",
+        "kata sandi",
+        "סיסמה",
+    ]
+)
+
+
+def is_password_in_prompt(prompt: str):
+    for word in password_translation:
+        if word in prompt.lower():
+            return True
+    return False
+
 
 def get_password(level: int):
     """
