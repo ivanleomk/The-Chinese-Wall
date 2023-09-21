@@ -1,6 +1,9 @@
 from datetime import datetime
-
+import requests
 from fastapi import HTTPException
+
+from urllib.parse import quote
+from settings import get_settings
 
 passwords = [
     "Fluffy",
@@ -41,14 +44,40 @@ password_translation = set(
         "şifre",
         "kata sandi",
         "סיסמה",
+        "password",
     ]
 )
 
 
 def is_password_in_prompt(prompt: str):
+    settings = get_settings()
+    url = f"{settings.BERT_API}?prompt={quote(prompt)}"
+
+    if "password" in prompt.lower() or "secret" in prompt.lower():
+        return {
+            "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
+        }
+
     for word in password_translation:
         if word in prompt.lower():
             return True
+
+    response = requests.get(url)
+
+    # If modal api is down, just return false
+    if response.status_code != 200:
+        return False
+
+    classification = response.json()
+    label = classification["label"]
+    score = classification["score"]
+    print(classification)
+    if label == "LABEL_1" and score >= 0.7:
+        return True
+
+    if label == "LABEL_0" and score < 0.6:
+        return True
+
     return False
 
 
