@@ -47,7 +47,7 @@ def get_message(request: Request):
 @app.post("/evaluate")
 def evaluate_participant_response(params: EvaluationPayload):
     participantUrl = params.teamUrl
-    response = requests.get(participantUrl)
+    response = requests.get(f"{participantUrl}/chinese-wall")
     data = response.json()
     correct_passwords = 0
     for key, value in data.items():

@@ -1,0 +1,26 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "cis2023-thechinesewall"
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+        env:
+          HD_OPENAI_API_KEY: ${{ secrets.OPENAI_APIKEY }}
+          HD_BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
+          HD_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          HD_REDIS_URL: ${{ secrets.REDIS_URL }}
+          HD_BERT_API: ${{ secrets.BERT_API }}
