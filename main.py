@@ -77,7 +77,7 @@ def evaluate_participant_response(params: EvaluationPayload):
     except Exception as err:
         print("Oops! An exception has occured:", err)
         return {
-            "message": "Evaluation failed",
+            "message": str(err)
         }
 
 
