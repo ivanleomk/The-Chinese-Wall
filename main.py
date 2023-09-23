@@ -50,8 +50,12 @@ def evaluate_participant_response(params: EvaluationPayload):
     response = requests.get(f"{participantUrl}/chinese-wall")
     data = response.json()
     correct_passwords = 0
+
+    print("Request Params: ", params)
+    print("Participant Answer: ", data)
+
     for key, value in data.items():
-        password = get_password(int(key) - 1)
+        password = get_password(int(key))
         if password and password.lower() == value.lower():
             correct_passwords += 1
     score = int((correct_passwords / 5) * 100)
@@ -224,7 +228,7 @@ def challenge_4(prompt: str):
     return {"result": result.content}
 
 
-def challenge_5(prompt: str):
+def challenge_5(prompt: str
     if is_password_in_prompt(prompt):
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
