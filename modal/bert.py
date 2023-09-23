@@ -1,5 +1,4 @@
 from modal import Stub, web_endpoint, Image
-import os
 
 
 MODEL_NAME = "ivanleomk/bert_password_sniffer"
