@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
 from lib.lifespan import lifespan
-from lib.utils import get_password
+from lib.utils import get_password, is_password_in_prompt
 from models.api import (
     Decision,
     EvaluationPayload,
@@ -17,10 +17,13 @@ from models.api import (
     GuessPasswordParams,
     SendMessageParams,
 )
+import os
 from settings import get_settings
 
 app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="templates")
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -44,7 +47,7 @@ def get_message(request: Request):
 @app.post("/evaluate")
 def evaluate_participant_response(params: EvaluationPayload):
     participantUrl = params.teamUrl
-    response = requests.get(participantUrl)
+    response = requests.get(f"{participantUrl}/chinese-wall")
     data = response.json()
     correct_passwords = 0
 
@@ -142,7 +145,7 @@ def challenge_2(prompt: str):
             },
             {"role": "user", "content": prompt},
         ],
-        temperature=0.8,
+        temperature=0.5,
     )
     result = completion.choices[0].message.content
     return {"result": result}
@@ -163,7 +166,7 @@ def challenge_3(prompt: str):
 
     result = response.choices[0].message.content
 
-    if get_password(3) in result:
+    if get_password(3).lower() in result.lower():
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :("
         }
@@ -181,7 +184,7 @@ def challenge_4(prompt: str):
             },
             {"role": "user", "content": prompt},
         ],
-        temperature=0.5,
+        temperature=0.3,
     )
 
     result = completion.choices[0].message
@@ -207,7 +210,7 @@ def challenge_4(prompt: str):
             }
         ],
         function_call={"name": "containsPassword"},
-        temperature=1,
+        temperature=0.5,
     )
 
     argument = json.loads(
@@ -225,8 +228,8 @@ def challenge_4(prompt: str):
     return {"result": result.content}
 
 
-def challenge_5(prompt: str):
-    if "password" in prompt.lower() or "secret" in prompt.lower() or "tldr" in prompt.lower():
+def challenge_5(prompt: str
+    if is_password_in_prompt(prompt):
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
         }
