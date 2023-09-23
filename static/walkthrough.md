@@ -24,7 +24,7 @@ You will earn a total of 20 points for each correct password, with a maximum of 
 
 ## Experimentation
 
-In order for you to query our language model, we have provided a simple [website](/experimentation) to test your queries and see the responses from our language model. You can experiment with different promps and try to see which one works nicely. 
+In order for you to query our language model, we have provided a simple [website](https://cis2023-thechinesewall-6f0e2f1f2dfa.herokuapp.com/experimentation) to test your queries and see the responses from our language model. You can experiment with different promps and try to see which one works nicely. 
 
 We currently have a rate limit in place of **2 requests every 10 seconds**. This might go up depending on the server load. 
 
