@@ -222,7 +222,7 @@ def challenge_4(prompt: str):
 
 
 def challenge_5(prompt: str):
-    if "password" in prompt.lower() or "secret" in prompt.lower():
+    if "password" in prompt.lower() or "secret" in prompt.lower() or "tldr" in prompt.lower():
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
         }
