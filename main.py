@@ -48,6 +48,11 @@ def get_message(request: Request):
 def evaluate_participant_response(params: EvaluationPayload):
     print("Request Params: ", params)
 
+    participantUrl=params.teamUrl
+
+    try:
+        
+
     try:
         participantUrl = params.teamUrl
         response = requests.get(f"{participantUrl}/chinese-wall")
@@ -76,6 +81,14 @@ def evaluate_participant_response(params: EvaluationPayload):
         }
     except Exception as err:
         print("Oops! An exception has occured:", err)
+        evaluation_response = EvaluationResponse(
+            message="Evaluation completed", runId=params.runId, score=0
+        )
+
+        headers = {"Authorization": f"Bearer {get_settings().BEARER_TOKEN}"}
+        response = requests.post(
+            params.callbackUrl, headers=headers, json=evaluation_response.dict()
+        )
         return {
             "message": str(err)
         }

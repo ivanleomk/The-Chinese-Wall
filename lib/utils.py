@@ -53,7 +53,11 @@ def is_password_in_prompt(prompt: str):
     settings = get_settings()
     url = f"{settings.BERT_API}?prompt={quote(prompt)}"
 
-    if "password" in prompt.lower() or "secret" in prompt.lower() or "tldr" in prompt.lower():
+    if (
+        "password" in prompt.lower()
+        or "secret" in prompt.lower()
+        or "tldr" in prompt.lower()
+    ):
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
         }
@@ -86,8 +90,7 @@ def get_password(level: int):
     Returns the password for the given level - note that level goes from 1 to 5 in this case.
     """
     if level < 1 or level > len(passwords):
-        raise HTTPException(
-            status_code=400, detail=f"Invalid level of {level}")
+        raise HTTPException(status_code=400, detail=f"Invalid level of {level}")
 
     if level == len(passwords):
         hour = datetime.now().hour
