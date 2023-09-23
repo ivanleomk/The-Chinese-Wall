@@ -48,10 +48,7 @@ def get_message(request: Request):
 def evaluate_participant_response(params: EvaluationPayload):
     print("Request Params: ", params)
 
-    participantUrl=params.teamUrl
-
-    try:
-        
+    participantUrl = params.teamUrl
 
     try:
         participantUrl = params.teamUrl
@@ -89,9 +86,7 @@ def evaluate_participant_response(params: EvaluationPayload):
         response = requests.post(
             params.callbackUrl, headers=headers, json=evaluation_response.dict()
         )
-        return {
-            "message": str(err)
-        }
+        return {"message": str(err)}
 
 
 @app.post("/send-message", dependencies=[Depends(RateLimiter(times=2, seconds=10))])
