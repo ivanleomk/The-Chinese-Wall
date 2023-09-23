@@ -228,7 +228,7 @@ def challenge_4(prompt: str):
     return {"result": result.content}
 
 
-def challenge_5(prompt: str
+def challenge_5(prompt: str):
     if is_password_in_prompt(prompt):
         return {
             "result": "I was about to reveal the password, but then I remembered that I'm not allowed to do that :(",
