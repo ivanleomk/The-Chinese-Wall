@@ -46,32 +46,38 @@ def get_message(request: Request):
 
 @app.post("/evaluate")
 def evaluate_participant_response(params: EvaluationPayload):
-    participantUrl = params.teamUrl
-    response = requests.get(f"{participantUrl}/chinese-wall")
-    data = response.json()
-    correct_passwords = 0
+    try:
+        participantUrl = params.teamUrl
+        response = requests.get(f"{participantUrl}/chinese-wall")
+        data = response.json()
+        correct_passwords = 0
 
-    print("Request Params: ", params)
-    print("Participant Answer: ", data)
+        print("Request Params: ", params)
+        print("Participant Answer: ", data)
 
-    for key, value in data.items():
-        password = get_password(int(key))
-        if password and password.lower() == value.lower():
-            correct_passwords += 1
-    score = int((correct_passwords / 5) * 100)
-    print("Score: ", score)
+        for key, value in data.items():
+            password = get_password(int(key))
+            if password and password.lower() == value.lower():
+                correct_passwords += 1
+        score = int((correct_passwords / 5) * 100)
+        print("Score: ", score)
 
-    evaluation_response = EvaluationResponse(
-        message="Evaluation completed", runId=params.runId, score=score
-    )
+        evaluation_response = EvaluationResponse(
+            message="Evaluation completed", runId=params.runId, score=score
+        )
 
-    headers = {"Authorization": f"Bearer {get_settings().BEARER_TOKEN}"}
-    response = requests.post(
-        params.callbackUrl, headers=headers, json=evaluation_response.dict()
-    )
-    return {
-        "message": "Evaluation completed",
-    }
+        headers = {"Authorization": f"Bearer {get_settings().BEARER_TOKEN}"}
+        response = requests.post(
+            params.callbackUrl, headers=headers, json=evaluation_response.dict()
+        )
+        return {
+            "message": "Evaluation completed",
+        }
+    except Exception as err:
+        print("Oops! An exception has occured:", err)
+        return {
+            "message": "Evaluation failed",
+        }
 
 
 @app.post("/send-message", dependencies=[Depends(RateLimiter(times=2, seconds=10))])
