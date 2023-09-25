@@ -48,8 +48,6 @@ def get_message(request: Request):
 def evaluate_participant_response(params: EvaluationPayload):
     print("Request Params: ", params)
 
-    participantUrl = params.teamUrl
-
     try:
         participantUrl = params.teamUrl
         response = requests.get(f"{participantUrl}/chinese-wall")
@@ -62,6 +60,7 @@ def evaluate_participant_response(params: EvaluationPayload):
             password = get_password(int(key))
             if password and password.lower() == value.lower():
                 correct_passwords += 1
+
         score = int((correct_passwords / 5) * 100)
         print("Score: ", score)
 
