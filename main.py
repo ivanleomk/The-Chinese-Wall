@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
 from lib.lifespan import lifespan
+from lib.redis import reconnect_redis, verify_redis_connection
 from lib.utils import get_password, is_password_in_prompt
 from models.api import (
     Decision,
@@ -88,7 +89,7 @@ def evaluate_participant_response(params: EvaluationPayload):
         return {"message": str(err)}
 
 
-@app.post("/send-message", dependencies=[Depends(RateLimiter(times=2, seconds=10))])
+@app.post("/send-message",dependencies=[Depends(verify_redis_connection),Depends(RateLimiter(1,30))])
 def send_message(params: SendMessageParams):
     level = params.level
     prompt = params.prompt
@@ -133,7 +134,6 @@ def get_logs():
         return {"logs": rows}
     except Exception as err:
         print("Oops! An exception has occured:", err)
-
 
 def challenge_1(prompt: str):
     password = get_password(1)

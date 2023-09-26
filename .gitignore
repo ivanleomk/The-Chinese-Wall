@@ -3,7 +3,7 @@ __pycache__/
 .venv/
 venv/
 .virtual
-
+virtual
 # macOS files
 .DS_Store
 
