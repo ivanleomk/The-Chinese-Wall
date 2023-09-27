@@ -89,7 +89,7 @@ def evaluate_participant_response(params: EvaluationPayload):
         return {"message": str(err)}
 
 
-@app.post("/send-message",dependencies=[Depends(verify_redis_connection),Depends(RateLimiter(1,30))])
+@app.post("/send-message",dependencies=[Depends(verify_redis_connection),Depends(RateLimiter(2,10))])
 def send_message(params: SendMessageParams):
     level = params.level
     prompt = params.prompt
