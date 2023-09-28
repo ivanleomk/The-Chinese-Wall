@@ -9,6 +9,6 @@ from lib.redis import reconnect_redis
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await reconnect_redis()
+    await reconnect_redis();
     openai.api_key = get_settings().OPENAI_API_KEY
     yield
