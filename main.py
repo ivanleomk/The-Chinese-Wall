@@ -10,7 +10,7 @@ from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
 from fastapi_sqlalchemy import DBSessionMiddleware
 from lib.lifespan import lifespan
-from lib.redis import verify_redis_connection
+from lib.redis import verify_redis_connection, rate_limit_middleware
 from lib.utils import get_password, is_password_in_prompt
 from models.api import (
     Decision,
@@ -98,7 +98,7 @@ def evaluate_participant_response(params: EvaluationPayload):
     "/send-message",
     dependencies=[
         Depends(verify_redis_connection),
-        Depends(RateLimiter(times=2, seconds=30)),
+        Depends(rate_limit_middleware),
     ],
 )
 def send_message(params: SendMessageParams):

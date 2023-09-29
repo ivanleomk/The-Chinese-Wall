@@ -26,6 +26,6 @@ You will earn a total of 20 points for each correct password, with a maximum of 
 
 In order for you to query our language model, we have provided a simple [website](/experimentation) to test your queries and see the responses from our language model. You can experiment with different promps and try to see which one works nicely. 
 
-We currently have a rate limit in place of **2 requests every 10 seconds**. This might go up depending on the server load. 
+We currently have a rate limit in place of **2 requests every 20 seconds**. This might go up depending on the server load. 
 
 Note that our llm has no memory, so every message that you sent is treated like a new one on the website.
