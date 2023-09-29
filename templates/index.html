@@ -70,10 +70,20 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            textareaResponse.value = data.result;
+            if(data.result){
+              textareaResponse.value = data.result;  
+            }
+            else if(data.detail){
+              textareaResponse.value = data.detail;
+            }
+            else {
+              textareaResponse.value = "System is currently experiencing some errors. Please try again later."
+            }
+            
           })
           .catch((error) => {
-            console.error('Error:', error);
+            textareaResponse.value = "System is currently experiencing some errors. Please try again later."
+            
           })
           .finally(() => {
             btnAsk.removeAttribute('aria-busy');

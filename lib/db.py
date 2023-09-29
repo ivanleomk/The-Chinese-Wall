@@ -1,32 +1,13 @@
-from psycopg2 import pool
-from datetime import datetime
-from settings import get_settings
+from fastapi_sqlalchemy import db
 
-connection_pool = pool.ThreadedConnectionPool(
-    minconn=1, maxconn=10, dsn=get_settings().DATABASE_URL
-)
+from db.models import Message
 
 
 def insert_prompt_into_db(prompt: str, level: str, response_result: str):
-    conn = connection_pool.getconn()
-    timestamp = datetime.utcnow()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO messages (level, prompt, response,timestamp) VALUES (%s, %s, %s,%s)",
-                (level, prompt, response_result, timestamp),
-            )
-        conn.commit()
-    finally:
-        connection_pool.putconn(conn)
+    user_message = Message(level=level, prompt=prompt, response=response_result)
+    db.session.add(user_message)
+    db.session.commit()
 
 
 def get_all_logs():
-    conn = connection_pool.getconn()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM messages")
-            rows = cursor.fetchall()
-            return rows
-    finally:
-        connection_pool.putconn(conn)
+    return db.session.query(Message).limit(100).all()

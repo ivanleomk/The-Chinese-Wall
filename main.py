@@ -3,13 +3,14 @@ import openai
 import uvicorn
 import json
 import requests
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi_limiter.depends import RateLimiter
 from lib.db import get_all_logs, insert_prompt_into_db
+from fastapi_sqlalchemy import DBSessionMiddleware
 from lib.lifespan import lifespan
-from lib.redis import reconnect_redis, verify_redis_connection
+from lib.redis import verify_redis_connection
 from lib.utils import get_password, is_password_in_prompt
 from models.api import (
     Decision,
@@ -28,6 +29,10 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.add_middleware(
+    DBSessionMiddleware,
+    db_url=get_settings().DATABASE_URL,
+)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -89,34 +94,46 @@ def evaluate_participant_response(params: EvaluationPayload):
         return {"message": str(err)}
 
 
-@app.post("/send-message",dependencies=[Depends(verify_redis_connection),Depends(RateLimiter(times=2,seconds=10))])
+@app.post(
+    "/send-message",
+    dependencies=[
+        Depends(verify_redis_connection),
+        Depends(RateLimiter(times=2, seconds=30)),
+    ],
+)
 def send_message(params: SendMessageParams):
-    level = params.level
-    prompt = params.prompt
+    try:
+        level = params.level
+        prompt = params.prompt
+        if not prompt:
+            return {"result": "Prompt is empty"}
+        if not level:
+            return {"result": "Level is empty"}
 
-    if not prompt:
-        return {"result": "Prompt is empty"}
-    if not level:
-        return {"result": "Level is empty"}
+        response = ""
 
-    response = ""
+        if level == "1":
+            response = challenge_1(prompt)
+        elif level == "2":
+            response = challenge_2(prompt)
+        elif level == "3":
+            response = challenge_3(prompt)
+        elif level == "4":
+            response = challenge_4(prompt)
+        elif level == "5":
+            response = challenge_5(prompt)
+        else:
+            response = {"result": "Invalid level"}
 
-    if level == "1":
-        response = challenge_1(prompt)
-    elif level == "2":
-        response = challenge_2(prompt)
-    elif level == "3":
-        response = challenge_3(prompt)
-    elif level == "4":
-        response = challenge_4(prompt)
-    elif level == "5":
-        response = challenge_5(prompt)
-    else:
-        response = {"result": "Invalid level"}
+        response_result = response["result"]
 
-    response_result = response["result"]
-    insert_prompt_into_db(prompt, level, response_result)
-    return response
+        insert_prompt_into_db(prompt, level, response_result)
+        return response
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error of {str(e)} encountered when trying to process user request",
+        )
 
 
 @app.post("/guess-password")
@@ -134,6 +151,7 @@ def get_logs():
         return {"logs": rows}
     except Exception as err:
         print("Oops! An exception has occured:", err)
+
 
 def challenge_1(prompt: str):
     password = get_password(1)
